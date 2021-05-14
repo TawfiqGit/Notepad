@@ -9,8 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Notepad">
-        <activity android:name=".NoteDetailActivity" android:parentActivityName=".NoteActivity">
+
+        <activity android:name=".NoteDetailActivity" android:parentActivityName=".NoteActivity"
+            android:windowSoftInputMode="adjustResize">
+
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".NoteActivity"/>
+
         </activity>
 
         <activity android:name=".NoteActivity">
