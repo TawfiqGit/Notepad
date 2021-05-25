@@ -4,22 +4,29 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.tawfiq.notepad.NoteDetailActivity.Companion.EXTRA_NOTE
 import com.tawfiq.notepad.NoteDetailActivity.Companion.EXTRA_NOTE_INDEX
 import com.tawfiq.notepad.NoteDetailActivity.Companion.REQUEST_CODE_EDIT
 import com.tawfiq.notepad.adapter.NoteAdapter
 import com.tawfiq.notepad.model.Note
+import com.tawfiq.notepad.utils.deleteNoteStock
+import com.tawfiq.notepad.utils.listLoadNote
+import com.tawfiq.notepad.utils.persisNote
 
 class NoteActivity : AppCompatActivity() ,View.OnClickListener{
 
     private lateinit var listNote : MutableList<Note>
     private lateinit var adapter: NoteAdapter
+    private lateinit var coordinatorLayout: CoordinatorLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +36,9 @@ class NoteActivity : AppCompatActivity() ,View.OnClickListener{
         setSupportActionBar(toolbar)
         val floatButton : FloatingActionButton = findViewById(R.id.floatingActionButtonAdd)
         floatButton.setOnClickListener(this)
+        coordinatorLayout  = findViewById(R.id.coordinator)
 
-        listNote = mutableListOf<Note>()
-        listNote.add(Note("Luffy","Capitaine"))
-        listNote.add(Note("Nami","Navigatrice"))
-        listNote.add(Note("Usop","Tireur"))
-        listNote.add(Note("Zorro","Bretteur"))
+        listNote = listLoadNote(this )
 
         adapter = NoteAdapter(listNote,this)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -53,7 +57,6 @@ class NoteActivity : AppCompatActivity() ,View.OnClickListener{
 
     override fun onClick(v: View) {
         if (v.tag != null){
-            Toast.makeText(baseContext,"position "+v.tag,Toast.LENGTH_LONG).show()
             showNoteDetail(v.tag as Int)
         }else {
             when (v.id){
@@ -67,7 +70,7 @@ class NoteActivity : AppCompatActivity() ,View.OnClickListener{
         val note = if (noteIndex < 0 ) Note() else listNote[noteIndex]
         val intent = Intent (this , NoteDetailActivity::class.java)
 
-        intent.putExtra(EXTRA_NOTE,note)
+        intent.putExtra(EXTRA_NOTE,note as Parcelable)
         intent.putExtra(EXTRA_NOTE_INDEX,noteIndex)
         startActivityForResult(intent,REQUEST_CODE_EDIT)
     }
@@ -87,6 +90,7 @@ class NoteActivity : AppCompatActivity() ,View.OnClickListener{
     }
 
     private fun saveData (note : Note, noteIndex: Int){
+        persisNote(this,note)
         if (noteIndex < 0){
             listNote.add(0,note)
         }else{
@@ -103,7 +107,9 @@ class NoteActivity : AppCompatActivity() ,View.OnClickListener{
         if (noteIndex < 0){
             return
         }
-        listNote.removeAt(noteIndex)
+        val note = listNote.removeAt(noteIndex)
+        deleteNoteStock(this,note)
         adapter.notifyDataSetChanged()
+        Snackbar.make(coordinatorLayout,"${note.title} supprimé",Snackbar.LENGTH_SHORT).show()
     }
 }
