@@ -1,7 +1,7 @@
 # Notepad
 
 ## Objectif  
-Afficher une liste de note avec la possibilite de créer, ajouter, supprimer et  modifier une note en Kotlin
+Afficher une liste de note avec la possibilite de créer, ajouter, supprimer et  modifier une note en **Kotlin**
 
 ## Fonctionnalité de l'app   
 
